@@ -18,6 +18,18 @@ use App\Helpers;
 
 Helpers::applySecurityHeaders();
 
+// 0. Handle Short Links (/go/{code})
+if (!empty($_GET['short_code'])) {
+    $shortCode = trim((string)$_GET['short_code']);
+    $shortService = new \App\ShortLink();
+    $resolved = $shortService->resolve($shortCode);
+    if ($resolved && $resolved['success'] && !empty($resolved['landing_page'])) {
+        $slug = $resolved['landing_page']['slug'];
+        header("Location: /" . $slug, true, 302);
+        exit;
+    }
+}
+
 $tracker = new Tracker();
 $result = $tracker->processClick($_GET);
 

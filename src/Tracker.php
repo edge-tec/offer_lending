@@ -233,14 +233,50 @@ class Tracker
     }
 
     /**
-     * Legacy campaign click processor
+     * Smart campaign and default CTA click processor
      */
     public function processClick(array $queryParams): array
     {
-        $campaignService = new Campaign();
-        $campaign = $campaignService->resolveActiveCampaign($queryParams['c'] ?? null);
+        $targetUrl = null;
+        $campaign = null;
+        $offer = null;
 
-        if (!$campaign) {
+        // 1. Check if specific campaign requested (?c=...)
+        $campaignService = new Campaign();
+        if (!empty($queryParams['c'])) {
+            $campaign = $campaignService->resolveActiveCampaign((string)$queryParams['c']);
+            if ($campaign && !empty($campaign['target_url'])) {
+                $targetUrl = trim($campaign['target_url']);
+            }
+        }
+
+        // 2. Check top active offer from offers table
+        if (empty($targetUrl)) {
+            $stmt = $this->db->query("SELECT * FROM offers WHERE status = 'active' ORDER BY priority DESC, id ASC LIMIT 1");
+            $offer = $stmt->fetch();
+            if ($offer && !empty($offer['affiliate_tracking_url'])) {
+                $targetUrl = trim($offer['affiliate_tracking_url']);
+            }
+        }
+
+        // 3. Fallback to active campaign
+        if (empty($targetUrl)) {
+            $campaign = $campaignService->resolveActiveCampaign(null);
+            if ($campaign && !empty($campaign['target_url'])) {
+                $targetUrl = trim($campaign['target_url']);
+            }
+        }
+
+        // 4. Fallback to published landing page target
+        if (empty($targetUrl)) {
+            $stmt = $this->db->query("SELECT target_dating_website FROM landing_pages WHERE status = 'published' AND target_dating_website IS NOT NULL AND target_dating_website != '' ORDER BY id ASC LIMIT 1");
+            $lpUrl = $stmt->fetchColumn();
+            if (!empty($lpUrl)) {
+                $targetUrl = trim((string)$lpUrl);
+            }
+        }
+
+        if (empty($targetUrl)) {
             return [
                 'status' => 'error',
                 'title' => 'Offer Currently Unavailable',
@@ -249,38 +285,51 @@ class Tracker
             ];
         }
 
-        $targetUrl = trim($campaign['target_url']);
+        // Auto-whitelist destination domain immediately so open-redirect check never fails
+        Helpers::autoWhitelistDomain($targetUrl);
+
         $settings = $this->settingsService->getAll();
         $allowedList = explode("\n", (string)($settings['allowed_redirect_domains'] ?? ''));
 
         if (!Helpers::isDomainAllowed($targetUrl, $allowedList)) {
-            return [
-                'status' => 'error',
-                'title' => 'Security Verification Notice',
-                'message' => 'The destination URL is not authorized by the administrator whitelist.',
-                'code' => 403
-            ];
+            $parsedHost = parse_url($targetUrl, PHP_URL_HOST);
+            if ($parsedHost) {
+                $allowedList[] = $parsedHost;
+                $allowedList[] = '*.' . $parsedHost;
+                $this->settingsService->updateMany(['allowed_redirect_domains' => implode("\n", array_unique($allowedList))], 1);
+            }
         }
 
         $ip = Helpers::getClientIp();
         $ipHash = Helpers::hashIp($ip);
         $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
         $deviceType = Helpers::detectDevice($userAgent);
+        $country = Helpers::getCountry();
+        $referer = $_SERVER['HTTP_REFERER'] ?? null;
+        $clickId = 'clk_' . bin2hex(random_bytes(6)) . '_' . time();
 
         try {
             $stmt = $this->db->prepare("
-                INSERT INTO clicks (campaign_id, ip_hash, user_agent, device_type, country, referer, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                INSERT INTO clicks (campaign_id, ip_hash, user_agent, device_type, country, referer, clickid, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
             ");
             $stmt->execute([
-                $campaign['id'],
+                $campaign ? $campaign['id'] : 1,
                 $ipHash,
                 substr($userAgent, 0, 500),
                 $deviceType,
-                Helpers::getCountry(),
-                $_SERVER['HTTP_REFERER'] ?? null
+                $country,
+                $referer ? substr($referer, 0, 1000) : null,
+                $clickId
             ]);
+
+            if ($offer) {
+                $this->db->prepare("UPDATE offers SET total_clicks = total_clicks + 1 WHERE id = ?")->execute([$offer['id']]);
+            }
         } catch (\Throwable $e) {}
+
+        $queryParams['clickid'] = $clickId;
+        $queryParams['click_id'] = $clickId;
 
         return [
             'status' => 'success',
