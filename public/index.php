@@ -568,10 +568,6 @@ $baseCtaUrl = '/go.php' . $campaignParam;
     <!-- Footer & Compliance -->
     <footer class="footer">
         <div class="container">
-            <div class="footer-disclosure-box">
-                <strong>Affiliate & Advertising Disclosure:</strong> This website is an independent promotional and affiliate portal designed to connect adult visitors with third-party dating platforms. We receive referral compensation when visitors click on affiliate links and register or subscribe to services on the destination site. This referral relationship does not influence our objective presentation of services. Friends With Benefits is operated by an independent third party. You must be at least 18 years old to access and participate.
-            </div>
-
             <div class="footer-grid">
                 <div class="footer-brand">
                     <a href="/" class="brand-logo">
@@ -603,7 +599,6 @@ $baseCtaUrl = '/go.php' . $campaignParam;
                     <ul class="footer-links">
                         <li><a href="/privacy.php">Privacy Policy</a></li>
                         <li><a href="/terms.php">Terms of Service</a></li>
-                        <li><a href="/affiliate-disclosure.php">Affiliate Disclosure</a></li>
                         <li><a href="/cookie-policy.php">Cookie Policy</a></li>
                         <li><a href="/admin/login.php">Admin Login</a></li>
                     </ul>
@@ -615,7 +610,7 @@ $baseCtaUrl = '/go.php' . $campaignParam;
                     &copy; <?= date('Y') ?> FWB Connect. All rights reserved. Strictly 18+ Only.
                 </div>
                 <div>
-                    Independent Promotional Portal &bull; SSL Secured &bull; Safe Browsing
+                    SSL Secured &bull; Safe Browsing
                 </div>
             </div>
         </div>

@@ -396,13 +396,9 @@ $primaryCtaHref = '/click.php?page_id=' . $landingPage['id'] . ($primaryOffer ? 
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <div class="footer-disclosure-box">
-                <strong>Affiliate & Advertising Disclosure:</strong> This website is an independent promotional and affiliate portal designed to connect adult visitors with third-party dating platforms. We receive referral compensation when visitors click on affiliate links and register or subscribe. The featured services are operated by independent third parties. You must be at least 18 years old to access and participate.
-            </div>
-
             <div class="footer-bottom">
                 <div>&copy; <?= date('Y') ?> <?= Helpers::e($landingPage['name']) ?>. Strictly 18+ Only.</div>
-                <div><a href="/privacy.php" style="color: #94a3b8;">Privacy Policy</a> &bull; <a href="/terms.php" style="color: #94a3b8;">Terms of Service</a> &bull; <a href="/affiliate-disclosure.php" style="color: #94a3b8;">Affiliate Disclosure</a></div>
+                <div><a href="/privacy.php" style="color: #94a3b8;">Privacy Policy</a> &bull; <a href="/terms.php" style="color: #94a3b8;">Terms of Service</a></div>
             </div>
         </div>
     </footer>
