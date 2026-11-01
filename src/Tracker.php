@@ -22,10 +22,48 @@ class Tracker
     /**
      * Process an Offer CTA Click from a Landing Page and redirect to the third-party affiliate tracking URL
      */
-    public function processOfferClick(int $offerId, ?int $landingPageId = null, array $queryParams = []): array
+    public function processOfferClick(?int $offerId, ?int $landingPageId = null, array $queryParams = []): array
     {
-        $offer = $this->offerService->getById($offerId);
-        if (!$offer || $offer['status'] !== 'active') {
+        $offer = ($offerId !== null && $offerId > 0) ? $this->offerService->getById($offerId) : null;
+        $targetUrl = null;
+
+        // 1. If Landing Page has a custom affiliate tracking URL (with parameters or explicit affiliate link), prioritize it!
+        $lpUrl = null;
+        if ($landingPageId !== null && $landingPageId > 0) {
+            $stmt = $this->db->prepare("SELECT target_dating_website FROM landing_pages WHERE id = ?");
+            $stmt->execute([$landingPageId]);
+            $lpUrl = trim((string)$stmt->fetchColumn());
+            if (!empty($lpUrl) && (str_starts_with($lpUrl, 'http://') || str_starts_with($lpUrl, 'https://'))) {
+                // If it has tracking params, /click/, aff, ref, or if no specific offer is active, use it as direct affiliate link
+                if (str_contains($lpUrl, '?') || str_contains($lpUrl, '&') || str_contains($lpUrl, 'click') || empty($offer)) {
+                    $targetUrl = $lpUrl;
+                    Helpers::autoWhitelistDomain($targetUrl);
+                }
+            }
+        }
+
+        // 2. Fall back to Offer's affiliate tracking URL
+        if (empty($targetUrl) && $offer && $offer['status'] === 'active') {
+            $targetUrl = trim($offer['affiliate_tracking_url']);
+            Helpers::autoWhitelistDomain($targetUrl);
+        }
+
+        // 3. Fall back to landing page base url if set
+        if (empty($targetUrl) && !empty($lpUrl)) {
+            $targetUrl = $lpUrl;
+            Helpers::autoWhitelistDomain($targetUrl);
+        }
+
+        // 3. Fall back to active default campaign
+        if (empty($targetUrl)) {
+            $activeCamp = $this->campaignService->getActive();
+            if ($activeCamp && !empty($activeCamp['target_url'])) {
+                $targetUrl = trim($activeCamp['target_url']);
+                Helpers::autoWhitelistDomain($targetUrl);
+            }
+        }
+
+        if (empty($targetUrl)) {
             return [
                 'status' => 'error',
                 'title' => 'Offer Currently Unavailable',
@@ -33,8 +71,6 @@ class Tracker
                 'code' => 404
             ];
         }
-
-        $targetUrl = trim($offer['affiliate_tracking_url']);
 
         // 1. Open Redirect Validation
         $settings = $this->settingsService->getAll();
@@ -83,7 +119,7 @@ class Tracker
                 )
             ");
             $stmt->execute([
-                $offerId,
+                $offer ? (int)$offer['id'] : null,
                 $landingPageId,
                 $sessionAttr['short_link_id'] ?? null,
                 $clickId,
@@ -96,8 +132,10 @@ class Tracker
                 $targetUrl
             ]);
 
-            // Increment offer total clicks
-            $this->db->prepare("UPDATE offers SET total_clicks = total_clicks + 1 WHERE id = ?")->execute([$offerId]);
+            // Increment counters
+            if ($offer) {
+                $this->db->prepare("UPDATE offers SET total_clicks = total_clicks + 1 WHERE id = ?")->execute([$offer['id']]);
+            }
 
             // Legacy compatibility write to `clicks` table
             $leg = $this->db->prepare("

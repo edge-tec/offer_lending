@@ -57,9 +57,9 @@ $pageTitle = $landingPage['page_title'] ?: $landingPage['name'];
 $heroImage = $landingPage['hero_image'] ?: '/assets/images/hero-couple.jpg';
 $badgeText = $landingPage['badge_text'] ?: '18+ Adults Only';
 
-// Determine primary offer
+// Determine primary offer & centralized CTA destination
 $primaryOffer = !empty($offers) ? $offers[0] : null;
-$primaryCtaHref = $primaryOffer ? '/click?offer_id=' . $primaryOffer['id'] . '&page_id=' . $landingPage['id'] : '/go';
+$primaryCtaHref = '/click?page_id=' . $landingPage['id'] . ($primaryOffer ? '&offer_id=' . $primaryOffer['id'] : '');
 ?>
 <!DOCTYPE html>
 <html lang="en">

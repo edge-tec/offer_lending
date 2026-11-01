@@ -22,8 +22,8 @@ Helpers::applySecurityHeaders();
 $offerId = (int)($_GET['offer_id'] ?? 0);
 $pageId = isset($_GET['page_id']) ? (int)$_GET['page_id'] : null;
 
-if ($offerId <= 0) {
-    // If no offer_id, fallback to general campaign redirect (/go)
+if ($offerId <= 0 && (!$pageId || $pageId <= 0)) {
+    // If no offer_id and no page_id, fallback to general campaign redirect (/go)
     require __DIR__ . '/go.php';
     exit;
 }

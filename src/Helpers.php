@@ -200,6 +200,25 @@ class Helpers
     }
 
     /**
+     * Auto-whitelist the destination domain for open-redirect safety
+     */
+    public static function autoWhitelistDomain(string $url, int $userId = 1): void
+    {
+        $parsedHost = parse_url($url, PHP_URL_HOST);
+        if (!$parsedHost) return;
+
+        $settings = new Settings();
+        $allowed = (string)$settings->get('allowed_redirect_domains', '');
+        $allowedRules = array_filter(array_map('trim', explode("\n", $allowed)));
+
+        if (!self::isDomainAllowed($url, $allowedRules)) {
+            $allowedRules[] = $parsedHost;
+            $allowedRules[] = '*.' . $parsedHost;
+            $settings->updateMany(['allowed_redirect_domains' => implode("\n", array_unique($allowedRules))], $userId);
+        }
+    }
+
+    /**
      * Send standard JSON response
      */
     public static function jsonResponse(array $data, int $status = 200): void

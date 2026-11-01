@@ -134,16 +134,19 @@ require_once __DIR__ . '/layout/header.php';
                             </td>
 
                             <td>
-                                <div>
-                                    <a href="/<?= Helpers::e($p['slug']) ?>" target="_blank" style="color: #fb7185; text-decoration: underline; font-weight: 600;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.45rem;">
+                                    <a href="/<?= Helpers::e($p['slug']) ?>" target="_blank" style="color: #fb7185; text-decoration: none; font-weight: 600; font-size: 0.92rem;" title="Open live landing page">
                                         /<?= Helpers::e($p['slug']) ?> ↗
                                     </a>
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="copyToClipboard('/<?= Helpers::e($p['slug']) ?>', this)" style="padding: 0.22rem 0.65rem; font-size: 0.74rem;" title="Copy Full Page URL">
+                                        📋 Copy URL
+                                    </button>
                                 </div>
                                 <?php if (!empty($p['short_code'])): ?>
-                                    <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.25rem;">
-                                        Short Link: <code>/go/<?= Helpers::e($p['short_code']) ?></code>
-                                        <button type="button" onclick="navigator.clipboard.writeText(window.location.origin + '/go/<?= Helpers::e($p['short_code']) ?>'); alert('Short Link copied!');" style="background: none; border: none; cursor: pointer; color: #a855f7; font-size: 0.75rem;" title="Copy to clipboard">
-                                            📋 Copy
+                                    <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; color: var(--text-muted);">
+                                        <span>Short: <code>/go/<?= Helpers::e($p['short_code']) ?></code></span>
+                                        <button type="button" class="btn btn-secondary btn-sm" onclick="copyToClipboard('/go/<?= Helpers::e($p['short_code']) ?>', this)" style="padding: 0.22rem 0.65rem; font-size: 0.74rem;" title="Copy Short Link">
+                                            🔗 Copy Short Link
                                         </button>
                                     </div>
                                 <?php endif; ?>

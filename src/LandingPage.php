@@ -169,6 +169,11 @@ class LandingPage
 
         $pageId = (int)$this->db->lastInsertId();
 
+        // Auto-whitelist domain if specified
+        if (!empty($data['target_dating_website'])) {
+            Helpers::autoWhitelistDomain((string)$data['target_dating_website'], $userId);
+        }
+
         // Automatically assign unique short tracking link
         $shortCode = trim($data['short_code'] ?? '');
         if ($shortCode === '') {
@@ -242,6 +247,11 @@ class LandingPage
             trim($data['custom_css'] ?? $existing['custom_css']),
             $id
         ]);
+
+        // Auto-whitelist domain if specified
+        if (!empty($data['target_dating_website'])) {
+            Helpers::autoWhitelistDomain((string)$data['target_dating_website'], $userId);
+        }
 
         // Sync offers if provided
         if (isset($data['offer_ids']) && is_array($data['offer_ids'])) {

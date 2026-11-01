@@ -2,16 +2,8 @@
     RewriteEngine On
     RewriteBase /
 
-    # Redirect /go and /go/{short_code}
+    # Redirect /go to go.php
     RewriteRule ^go/?$ go.php [L,QSA]
-    RewriteRule ^go/([a-zA-Z0-9_-]+)/?$ go.php?short_code=$1 [L,QSA]
-
-    # Centralized Click Redirect
-    RewriteRule ^click/?$ click.php [L,QSA]
-
-    # S2S Postback Endpoints
-    RewriteRule ^postback/?$ api/postback.php [L,QSA]
-    RewriteRule ^api/postback/?$ api/postback.php [L,QSA]
 
     # Redirect /track-view to track-view.php
     RewriteRule ^track-view/?$ track-view.php [L,QSA]
@@ -19,10 +11,10 @@
     # Prevent directory listing
     Options -Indexes
 
-    # Clean URL routing for landing pages
+    # Standard rewrite for clean URLs if file doesn't exist
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.*)$ render-page.php?slug=$1 [L,QSA]
+    RewriteRule ^(.*)$ index.php [L,QSA]
 </IfModule>
 
 <IfModule mod_headers.c>

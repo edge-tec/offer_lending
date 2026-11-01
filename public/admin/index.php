@@ -186,7 +186,12 @@ require_once __DIR__ . '/layout/header.php';
                             </td>
                             <td>
                                 <?php if (!empty($tp['short_code'])): ?>
-                                    <code>/go/<?= Helpers::e($tp['short_code']) ?></code>
+                                    <div style="display: flex; align-items: center; gap: 0.35rem;">
+                                        <code>/go/<?= Helpers::e($tp['short_code']) ?></code>
+                                        <button type="button" class="btn btn-secondary btn-sm" onclick="copyToClipboard('/go/<?= Helpers::e($tp['short_code']) ?>', this)" style="padding: 0.15rem 0.45rem; font-size: 0.7rem;" title="Copy Short Link">
+                                            📋
+                                        </button>
+                                    </div>
                                 <?php else: ?>
                                     <span style="color: var(--text-dim);">-</span>
                                 <?php endif; ?>
@@ -194,7 +199,12 @@ require_once __DIR__ . '/layout/header.php';
                             <td><?= number_format((int)$tp['visitors_count']) ?></td>
                             <td style="font-weight: 700;"><?= number_format((int)$tp['clicks_count']) ?></td>
                             <td>
-                                <a href="/<?= Helpers::e($tp['slug']) ?>" target="_blank" class="btn btn-secondary btn-sm">↗</a>
+                                <div style="display: inline-flex; gap: 0.35rem;">
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="copyToClipboard('/<?= Helpers::e($tp['slug']) ?>', this)" style="padding: 0.2rem 0.5rem; font-size: 0.72rem;" title="Copy Page URL">
+                                        📋 Copy
+                                    </button>
+                                    <a href="/<?= Helpers::e($tp['slug']) ?>" target="_blank" class="btn btn-secondary btn-sm" title="Open Page">↗</a>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>

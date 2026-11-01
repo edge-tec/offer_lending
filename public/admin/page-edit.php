@@ -118,11 +118,19 @@ require_once __DIR__ . '/layout/header.php';
             <h2 style="font-size: 1.4rem; font-weight: 800;"><?= $isEditing ? 'Visual Builder: ' . Helpers::e($landingPage['name']) : 'New Custom Landing Page' ?></h2>
         </div>
 
-        <div style="display: flex; gap: 0.75rem;">
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
             <?php if ($isEditing): ?>
+                <button type="button" class="btn btn-secondary" onclick="copyToClipboard('/<?= Helpers::e($landingPage['slug']) ?>', this)">
+                    <span>📋 Copy Page URL</span>
+                </button>
+                <?php if (!empty($currentShortCode)): ?>
+                    <button type="button" class="btn btn-secondary" onclick="copyToClipboard('/go/<?= Helpers::e($currentShortCode) ?>', this)">
+                        <span>🔗 Copy Short Link</span>
+                    </button>
+                <?php endif; ?>
                 <a href="/<?= Helpers::e($landingPage['slug']) ?>?preview=1" target="_blank" class="btn btn-secondary">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                    <span>Live Preview</span>
+                    <span>Live Preview ↗</span>
                 </a>
             <?php endif; ?>
             <button type="submit" class="btn btn-primary">
@@ -150,19 +158,41 @@ require_once __DIR__ . '/layout/header.php';
                     <div class="form-group">
                         <label class="form-label">URL Slug</label>
                         <input type="text" name="slug" class="form-control" value="<?= Helpers::e($landingPage['slug'] ?? '') ?>" placeholder="e.g. friends-with-benefits" required>
-                        <div class="form-text">Direct URL: <code>/your-slug</code></div>
+                        <div class="form-text">Direct URL: <code>/<?= Helpers::e($landingPage['slug'] ?? 'your-slug') ?></code></div>
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Unique Short Tracking Code</label>
                         <input type="text" name="short_code" class="form-control" value="<?= Helpers::e($currentShortCode) ?>" placeholder="e.g. fwb01">
-                        <div class="form-text">Short Link: <code>/go/your-code</code></div>
+                        <div class="form-text">Short Link: <code>/go/<?= Helpers::e($currentShortCode ?: 'your-code') ?></code></div>
                     </div>
                 </div>
 
+                <?php if ($isEditing): ?>
+                    <div style="background: rgba(244, 63, 94, 0.08); border: 1px solid rgba(244, 63, 94, 0.25); border-radius: var(--radius-sm); padding: 1rem 1.25rem; margin-bottom: 1.25rem;">
+                        <div style="font-weight: 700; font-size: 0.88rem; color: #fb7185; margin-bottom: 0.65rem;">Quick Share & Tracking Links</div>
+                        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="copyToClipboard('/<?= Helpers::e($landingPage['slug']) ?>', this)">
+                                📋 Copy Full Landing Page URL
+                            </button>
+                            <?php if (!empty($currentShortCode)): ?>
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="copyToClipboard('/go/<?= Helpers::e($currentShortCode) ?>', this)">
+                                    🔗 Copy Short Tracking Link (/go/<?= Helpers::e($currentShortCode) ?>)
+                                </button>
+                            <?php endif; ?>
+                            <a href="/<?= Helpers::e($landingPage['slug']) ?>" target="_blank" class="btn btn-secondary btn-sm" style="margin-left: auto;">
+                                ↗ Open Page
+                            </a>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
                 <div class="form-group">
-                    <label class="form-label">Promoted Dating Website</label>
-                    <input type="url" name="target_dating_website" class="form-control" value="<?= Helpers::e($landingPage['target_dating_website'] ?? 'https://friends-with-benefits.com') ?>" placeholder="https://friends-with-benefits.com">
+                    <label class="form-label">Promoted Dating Website / Affiliate Tracking URL</label>
+                    <input type="url" name="target_dating_website" class="form-control" value="<?= Helpers::e($landingPage['target_dating_website'] ?? 'https://friends-with-benefits.com') ?>" placeholder="https://friends-with-benefits.com or https://your-network.com/click?aff=123" required>
+                    <div class="form-text" style="color: #34d399; font-weight: 500;">
+                        ✓ Active Gateway: All CTA buttons on this landing page will automatically track and redirect to this URL. Any affiliate domain entered here is automatically whitelisted.
+                    </div>
                 </div>
             </div>
 
