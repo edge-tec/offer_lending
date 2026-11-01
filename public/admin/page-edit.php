@@ -189,9 +189,9 @@ require_once __DIR__ . '/layout/header.php';
 
                 <div class="form-group">
                     <label class="form-label">Promoted Dating Website / Affiliate Tracking URL</label>
-                    <input type="url" name="target_dating_website" class="form-control" value="<?= Helpers::e($landingPage['target_dating_website'] ?? 'https://friends-with-benefits.com') ?>" placeholder="https://friends-with-benefits.com or https://your-network.com/click?aff=123" required>
+                    <input type="text" name="target_dating_website" class="form-control" value="<?= Helpers::e($landingPage['target_dating_website'] ?? 'https://friends-with-benefits.com') ?>" placeholder="https://your-network.com/click?click_id={click_id}" required style="font-family: monospace;">
                     <div class="form-text" style="color: #34d399; font-weight: 500;">
-                        ✓ Active Gateway: All CTA buttons on this landing page will automatically track and redirect to this URL. Any affiliate domain entered here is automatically whitelisted.
+                        ✓ Active Gateway: CTA buttons track & redirect here. Supports <code>{click_id}</code> & <code>{subid}</code> macros. Domain is auto-authorized.
                     </div>
                 </div>
             </div>

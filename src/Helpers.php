@@ -162,10 +162,68 @@ class Helpers
     }
 
     /**
-     * Cleanly merge query parameters into a target affiliate URL
+     * Replace tracking macros in an affiliate tracking URL (e.g. {click_id}, {clickid}, {subid})
+     */
+    public static function replaceTrackingMacros(string $url, string $clickId, ?string $subid = null, array $extra = []): string
+    {
+        $effectiveSubid = ($subid !== null && $subid !== '') ? $subid : $clickId;
+
+        $replacements = [
+            '{click_id}'       => $clickId,
+            '{clickid}'        => $clickId,
+            '{CLICK_ID}'       => $clickId,
+            '{CLICKID}'        => $clickId,
+            '{clickId}'        => $clickId,
+            '{cid}'            => $clickId,
+            '{CID}'            => $clickId,
+            '{txid}'           => $clickId,
+            '{transaction_id}' => $clickId,
+            '[click_id]'       => $clickId,
+            '[clickid]'        => $clickId,
+            '[CLICK_ID]'       => $clickId,
+            '[CLICKID]'        => $clickId,
+            '%7Bclick_id%7D'   => $clickId,
+            '%7Bclickid%7D'    => $clickId,
+            '%7BCLICK_ID%7D'   => $clickId,
+            '%7BCLICKID%7D'    => $clickId,
+            '%7BclickId%7D'    => $clickId,
+            '%5Bclick_id%5D'   => $clickId,
+            '%5Bclickid%5D'    => $clickId,
+            '{subid}'          => $effectiveSubid,
+            '{sub_id}'         => $effectiveSubid,
+            '{SUBID}'          => $effectiveSubid,
+            '[subid]'          => $effectiveSubid,
+            '%7Bsubid%7D'      => $effectiveSubid,
+            '%7Bsub_id%7D'     => $effectiveSubid,
+            '%5Bsubid%5D'      => $effectiveSubid,
+        ];
+
+        foreach ($extra as $key => $val) {
+            if ($val !== null && is_scalar($val) && !isset($replacements['{' . $key . '}'])) {
+                $valStr = (string)$val;
+                $replacements['{' . $key . '}'] = $valStr;
+                $replacements['[' . $key . ']'] = $valStr;
+                $replacements['%7B' . $key . '%7D'] = $valStr;
+                $replacements['%5B' . $key . '%5D'] = $valStr;
+            }
+        }
+
+        return str_ireplace(array_keys($replacements), array_values($replacements), $url);
+    }
+
+    /**
+     * Cleanly merge query parameters into a target affiliate URL with macro replacement
      */
     public static function mergeQueryParams(string $targetUrl, array $incomingParams): string
     {
+        $clickId = trim((string)($incomingParams['click_id'] ?? $incomingParams['clickid'] ?? ''));
+        $subid = trim((string)($incomingParams['subid'] ?? ''));
+
+        // 1. Perform macro substitution on the target URL if click_id or subid is available
+        if ($clickId !== '' || $subid !== '') {
+            $targetUrl = self::replaceTrackingMacros($targetUrl, $clickId, $subid ?: null, $incomingParams);
+        }
+
         $parsed = parse_url($targetUrl);
         $existingQuery = [];
         if (isset($parsed['query'])) {
@@ -174,7 +232,10 @@ class Helpers
 
         // Whitelisted incoming tracking parameters to forward
         $forwardKeys = [
-            'subid', 'subid2', 'subid3', 'clickid', 'aff_sub', 'aff_sub2', 'aff_sub3',
+            'click_id', 'clickid', 'clickId',
+            'subid', 'sub_id', 'subid1', 'subid2', 'subid3', 'subid4', 'subid5',
+            'aff_sub', 'aff_sub2', 'aff_sub3', 'aff_sub4', 'aff_sub5',
+            's1', 's2', 's3', 's4', 's5', 'c1', 'c2', 'c3', 'cid', 'sid', 'tid',
             'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term',
             'source', 'placement', 'ad_id', 'campaign_id', 'gclid', 'fbclid', 'ttclid'
         ];
@@ -183,6 +244,16 @@ class Helpers
         foreach ($forwardKeys as $key) {
             if (isset($incomingParams[$key]) && trim((string)$incomingParams[$key]) !== '') {
                 $forwardParams[$key] = trim((string)$incomingParams[$key]);
+            }
+        }
+
+        // Guarantee both click_id and clickid are passed so every affiliate network receives the real-time click ID
+        if ($clickId !== '') {
+            if (!isset($existingQuery['click_id']) && !isset($forwardParams['click_id'])) {
+                $forwardParams['click_id'] = $clickId;
+            }
+            if (!isset($existingQuery['clickid']) && !isset($forwardParams['clickid'])) {
+                $forwardParams['clickid'] = $clickId;
             }
         }
 

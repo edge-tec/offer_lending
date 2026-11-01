@@ -309,6 +309,32 @@ class Tracker
         $clickId = 'clk_' . bin2hex(random_bytes(6)) . '_' . time();
 
         try {
+            $subid = $queryParams['subid'] ?? null;
+            $stmtOfferClick = $this->db->prepare("
+                INSERT INTO offer_clicks (
+                    offer_id, landing_page_id, short_link_id, click_id, subid,
+                    ip_hash, user_agent, device_type, country, referer,
+                    target_url_resolved, created_at
+                ) VALUES (
+                    ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?,
+                    ?, CURRENT_TIMESTAMP
+                )
+            ");
+            $stmtOfferClick->execute([
+                $offer ? (int)$offer['id'] : null,
+                null,
+                null,
+                $clickId,
+                $subid ? substr((string)$subid, 0, 100) : null,
+                $ipHash,
+                substr($userAgent, 0, 500),
+                $deviceType,
+                $country,
+                $referer ? substr($referer, 0, 1000) : null,
+                $targetUrl
+            ]);
+
             $stmt = $this->db->prepare("
                 INSERT INTO clicks (campaign_id, ip_hash, user_agent, device_type, country, referer, clickid, created_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)

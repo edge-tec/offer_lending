@@ -31,7 +31,7 @@ if ($uri === '/click' || $uri === '/click/') {
 }
 
 // 3. If /postback requested, dispatch to api/postback.php
-if ($uri === '/postback' || $uri === '/postback/' || $uri === '/api/postback' || $uri === '/api/postback/') {
+if ($uri === '/postback' || $uri === '/postback/' || $uri === '/api/postback' || $uri === '/api/postback/' || $uri === '/postback.php') {
     require __DIR__ . '/api/postback.php';
     exit;
 }

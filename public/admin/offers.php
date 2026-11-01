@@ -150,8 +150,8 @@ require_once __DIR__ . '/layout/header.php';
 
         <div class="form-group">
             <label class="form-label">Affiliate Tracking URL</label>
-            <input type="url" name="affiliate_tracking_url" class="form-control" value="<?= Helpers::e($editOffer['affiliate_tracking_url']) ?>" required style="font-family: monospace;">
-            <div class="form-text">All clicks on this offer's CTA buttons route here. Destination domain is auto-authorized in whitelist.</div>
+            <input type="text" name="affiliate_tracking_url" class="form-control" value="<?= Helpers::e($editOffer['affiliate_tracking_url']) ?>" required style="font-family: monospace;">
+            <div class="form-text">Supports real-time macros: <code>{click_id}</code>, <code>{subid}</code>. If no macro is provided, <code>click_id</code> and <code>clickid</code> are automatically appended.</div>
         </div>
 
         <div class="form-group">
@@ -307,8 +307,8 @@ require_once __DIR__ . '/layout/header.php';
 
             <div class="form-group">
                 <label class="form-label">Affiliate Tracking URL</label>
-                <input type="url" name="affiliate_tracking_url" class="form-control" placeholder="https://example-dating.com/?aff_id=YOUR_ID" required>
-                <div class="form-text">Destination domain is auto-authorized in whitelist upon save.</div>
+                <input type="text" name="affiliate_tracking_url" class="form-control" placeholder="https://example-dating.com/?click_id={click_id}" required>
+                <div class="form-text">Supports <code>{click_id}</code> and <code>{subid}</code> macros. Domain is auto-authorized in whitelist.</div>
             </div>
 
             <div class="form-group">

@@ -79,7 +79,9 @@ class Offer
         if ($code === '') {
             $code = preg_replace('/[^a-z0-9_-]/i', '-', strtolower($name));
         }
-        if (!filter_var($affUrl, FILTER_VALIDATE_URL)) {
+        $testUrl = preg_replace('/\{[a-zA-Z0-9_-]+\}/', 'macro', $affUrl);
+        $testUrl = preg_replace('/\[[a-zA-Z0-9_-]+\]/', 'macro', (string)$testUrl);
+        if (!filter_var($testUrl, FILTER_VALIDATE_URL)) {
             return ['success' => false, 'message' => 'A valid HTTP/HTTPS affiliate tracking URL is required.'];
         }
         if ($this->getByCode($code)) {
@@ -134,7 +136,9 @@ class Offer
         $code = trim($data['offer_code'] ?? $existing['offer_code']);
         $affUrl = trim($data['affiliate_tracking_url'] ?? $existing['affiliate_tracking_url']);
 
-        if (!filter_var($affUrl, FILTER_VALIDATE_URL)) {
+        $testUrl = preg_replace('/\{[a-zA-Z0-9_-]+\}/', 'macro', $affUrl);
+        $testUrl = preg_replace('/\[[a-zA-Z0-9_-]+\]/', 'macro', (string)$testUrl);
+        if (!filter_var($testUrl, FILTER_VALIDATE_URL)) {
             return ['success' => false, 'message' => 'A valid HTTP/HTTPS affiliate tracking URL is required.'];
         }
 

@@ -21,9 +21,37 @@ class Postback
     public function handle(array $params, string $method = 'GET', ?string $rawBody = null): array
     {
         $ip = Helpers::getClientIp();
-        $clickId = trim((string)($params['clickid'] ?? $params['click_id'] ?? $params['subid'] ?? ''));
-        $txid = trim((string)($params['txid'] ?? $params['transaction_id'] ?? $params['trans_id'] ?? ''));
-        $payout = (float)($params['payout'] ?? $params['revenue'] ?? $params['amount'] ?? 0.0);
+        $clickId = trim((string)(
+            $params['click_id'] ?? 
+            $params['clickid'] ?? 
+            $params['clickId'] ?? 
+            $params['CLICK_ID'] ?? 
+            $params['CLICKID'] ?? 
+            $params['subid'] ?? 
+            $params['sub_id'] ?? 
+            $params['cid'] ?? 
+            $params['s1'] ?? 
+            $params['s2'] ?? 
+            $params['aff_sub'] ?? 
+            $params['aff_sub1'] ?? 
+            ''
+        ));
+        $txid = trim((string)(
+            $params['txid'] ?? 
+            $params['transaction_id'] ?? 
+            $params['trans_id'] ?? 
+            $params['order_id'] ?? 
+            $params['conversion_id'] ?? 
+            $params['id'] ?? 
+            ''
+        ));
+        $payout = (float)(
+            $params['payout'] ?? 
+            $params['revenue'] ?? 
+            $params['amount'] ?? 
+            $params['commission'] ?? 
+            0.0
+        );
         $currency = strtoupper(trim((string)($params['currency'] ?? 'USD')));
         $status = strtolower(trim((string)($params['status'] ?? 'approved')));
 
@@ -55,8 +83,16 @@ class Postback
         $findClick->execute([$clickId]);
         $clickRow = $findClick->fetch();
 
-        $offerId = $clickRow ? (int)$clickRow['offer_id'] : (!empty($params['offer_id']) ? (int)$params['offer_id'] : null);
-        $pageId = $clickRow ? (int)$clickRow['landing_page_id'] : null;
+        if (!$clickRow) {
+            $findLegacy = $this->db->prepare("SELECT * FROM clicks WHERE clickid = ? OR subid = ? LIMIT 1");
+            $findLegacy->execute([$clickId, $clickId]);
+            $legacyRow = $findLegacy->fetch();
+            $offerId = !empty($params['offer_id']) ? (int)$params['offer_id'] : null;
+            $pageId = !empty($params['landing_page_id']) ? (int)$params['landing_page_id'] : null;
+        } else {
+            $offerId = $clickRow['offer_id'] ? (int)$clickRow['offer_id'] : (!empty($params['offer_id']) ? (int)$params['offer_id'] : null);
+            $pageId = $clickRow['landing_page_id'] ? (int)$clickRow['landing_page_id'] : (!empty($params['landing_page_id']) ? (int)$params['landing_page_id'] : null);
+        }
 
         // 4. Record Conversion
         $convStmt = $this->db->prepare("
@@ -71,6 +107,7 @@ class Postback
             'success' => true,
             'message' => 'Conversion recorded successfully.',
             'transaction_id' => $txid,
+            'click_id' => $clickId,
             'payout' => $payout,
             'code' => 200
         ];

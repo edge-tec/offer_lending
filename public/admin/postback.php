@@ -32,19 +32,21 @@ require_once __DIR__ . '/layout/header.php';
 <!-- Postback URL Integration Helper Card -->
 <div class="card" style="border: 1px solid rgba(139, 92, 246, 0.4); background: rgba(139, 92, 246, 0.05);">
     <div class="card-header">
-        <h3 class="card-title">Your S2S Postback Integration URL</h3>
+        <h3 class="card-title">Real-Time S2S Postback Integration</h3>
     </div>
-    <p style="font-size: 0.88rem; color: #cbd5e1; margin-bottom: 1rem;">
-        Provide this Postback URL in your Affiliate Network / Smartlink Dashboard (AffsCash, Cake, Tune, HasOffers, Voluum, etc.):
+    <p style="font-size: 0.88rem; color: #cbd5e1; margin-bottom: 0.75rem;">
+        Paste this Postback URL in your Affiliate Network / Smartlink Dashboard (AffsCash, Cake, Tune, HasOffers, Voluum, Everflow, etc.):
     </p>
-    <div style="background: rgba(0,0,0,0.5); padding: 1rem; border-radius: var(--radius-sm); font-family: monospace; font-size: 0.88rem; color: #34d399; word-break: break-all; display: flex; align-items: center; justify-content: space-between;">
-        <span id="postbackUrlText"><?= (isset($_SERVER['HTTPS']) ? 'https://' : 'http://') . ($_SERVER['HTTP_HOST'] ?? 'localhost:8000') ?>/postback?clickid={clickid}&payout={payout}&txid={txid}</span>
+    <div style="background: rgba(0,0,0,0.5); padding: 1rem; border-radius: var(--radius-sm); font-family: monospace; font-size: 0.88rem; color: #34d399; word-break: break-all; display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+        <span id="postbackUrlText"><?= (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https://' : 'https://') . ($_SERVER['HTTP_HOST'] ?? 'onlyflrt.net') ?>/postback?click_id={click_id}&payout={payout}&txid={txid}</span>
         <button type="button" class="btn btn-secondary btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('postbackUrlText').innerText); alert('Postback URL copied!');">
             Copy URL
         </button>
     </div>
-    <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.5rem;">
-        Parameters: <code>clickid</code> (Required - matches original click), <code>payout</code> (Commission amount), <code>txid</code> (Unique Transaction ID to prevent duplicate reporting).
+    <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.75rem; line-height: 1.6;">
+        <div><strong>Supported Click Parameters:</strong> <code>click_id</code>, <code>clickid</code>, <code>subid</code>, <code>cid</code> (automatically reconciled in real time).</div>
+        <div><strong>Macro Support in Offer URLs:</strong> You can place <code>{click_id}</code> or <code>{subid}</code> in your offer URLs (e.g., <code>https://network.com/offer?click_id={click_id}</code>) and it will automatically be populated with the live generated click ID upon redirect.</div>
+        <div><strong>Endpoints Active:</strong> <code>/postback</code> &bull; <code>/postback.php</code> &bull; <code>/api/postback.php</code></div>
     </div>
 </div>
 

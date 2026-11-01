@@ -107,7 +107,9 @@ class Campaign
         if ($code === '') {
             $code = preg_replace('/[^a-z0-9_-]/i', '-', strtolower($name));
         }
-        if (!filter_var($url, FILTER_VALIDATE_URL) || (!str_starts_with($url, 'http://') && !str_starts_with($url, 'https://'))) {
+        $testUrl = preg_replace('/\{[a-zA-Z0-9_-]+\}/', 'macro', $url);
+        $testUrl = preg_replace('/\[[a-zA-Z0-9_-]+\]/', 'macro', (string)$testUrl);
+        if (!filter_var($testUrl, FILTER_VALIDATE_URL) || (!str_starts_with($url, 'http://') && !str_starts_with($url, 'https://'))) {
             return ['success' => false, 'message' => 'A valid HTTP/HTTPS affiliate tracking URL is required.'];
         }
 
@@ -159,7 +161,9 @@ class Campaign
         if ($name === '') {
             return ['success' => false, 'message' => 'Campaign name cannot be empty.'];
         }
-        if (!filter_var($url, FILTER_VALIDATE_URL) || (!str_starts_with($url, 'http://') && !str_starts_with($url, 'https://'))) {
+        $testUrl = preg_replace('/\{[a-zA-Z0-9_-]+\}/', 'macro', $url);
+        $testUrl = preg_replace('/\[[a-zA-Z0-9_-]+\]/', 'macro', (string)$testUrl);
+        if (!filter_var($testUrl, FILTER_VALIDATE_URL) || (!str_starts_with($url, 'http://') && !str_starts_with($url, 'https://'))) {
             return ['success' => false, 'message' => 'A valid HTTP/HTTPS affiliate tracking URL is required.'];
         }
 
