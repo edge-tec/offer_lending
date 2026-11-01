@@ -10,6 +10,37 @@ declare(strict_types=1);
  * - $sections (array of sections from landing_page_sections)
  */
 
+if (!isset($landingPage)) {
+    require_once __DIR__ . '/../bootstrap.php';
+    $slug = trim((string)($_GET['slug'] ?? 'friends-with-benefits'), '/');
+    if ($slug === '' || $slug === 'index.php') {
+        $slug = 'friends-with-benefits';
+    }
+    $db = \App\Database::getInstance();
+    $page = $db->fetch("SELECT * FROM landing_pages WHERE slug = ? AND status = 'published'", [$slug]);
+    if (!$page) {
+        $page = $db->fetch("SELECT * FROM landing_pages WHERE status = 'published' ORDER BY id ASC LIMIT 1");
+    }
+    if (!$page) {
+        http_response_code(404);
+        echo "Landing page not found.";
+        exit;
+    }
+    $landingPage = $page;
+    $offers = $db->fetchAll("
+        SELECT o.*, lpo.display_order, lpo.custom_cta_text, lpo.custom_badge
+        FROM landing_page_offers lpo
+        JOIN offers o ON lpo.offer_id = o.id
+        WHERE lpo.landing_page_id = ? AND o.status = 'active'
+        ORDER BY lpo.display_order ASC
+    ", [$page['id']]);
+    $sections = $db->fetchAll("
+        SELECT * FROM landing_page_sections
+        WHERE landing_page_id = ? AND is_active = 1
+        ORDER BY display_order ASC
+    ", [$page['id']]);
+}
+
 use App\Helpers;
 use App\Settings;
 
