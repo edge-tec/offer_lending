@@ -16,7 +16,7 @@ class Media
         $this->db = Database::getInstance()->getConnection();
         $this->uploadDir = __DIR__ . '/../public/uploads/';
         if (!is_dir($this->uploadDir)) {
-            mkdir($this->uploadDir, 0755, true);
+            @mkdir($this->uploadDir, 0775, true);
         }
     }
 
@@ -37,6 +37,14 @@ class Media
     {
         if ($file['error'] !== UPLOAD_ERR_OK) {
             return ['success' => false, 'message' => 'Upload error code: ' . $file['error']];
+        }
+
+        if (!is_dir($this->uploadDir) && !@mkdir($this->uploadDir, 0775, true)) {
+            return ['success' => false, 'message' => 'Upload directory does not exist and could not be created. Please verify server permissions.'];
+        }
+
+        if (!is_writable($this->uploadDir)) {
+            return ['success' => false, 'message' => 'Upload directory is not writable. Please set write permissions (chmod -R 775 public/uploads).'];
         }
 
         $allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
