@@ -63,6 +63,43 @@ class Database
         return $this->driver;
     }
 
+    public function fetch(string $sql, array $params = []): ?array
+    {
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        $res = $stmt->fetch();
+        return $res ?: null;
+    }
+
+    public function fetchAll(string $sql, array $params = []): array
+    {
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll();
+    }
+
+    public function fetchColumn(string $sql, array $params = []): mixed
+    {
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchColumn();
+    }
+
+    public function prepare(string $sql): \PDOStatement
+    {
+        return $this->pdo->prepare($sql);
+    }
+
+    public function query(string $sql): \PDOStatement
+    {
+        return $this->pdo->query($sql);
+    }
+
+    public function exec(string $sql): int
+    {
+        return $this->pdo->exec($sql);
+    }
+
     // Prevent cloning and unserialization
     private function __clone() {}
     public function __wakeup() {

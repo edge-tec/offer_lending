@@ -28,7 +28,8 @@ if (!isset($landingPage)) {
     }
     $landingPage = $page;
     $offers = $db->fetchAll("
-        SELECT o.*, lpo.display_order, lpo.custom_cta_text, lpo.custom_badge
+        SELECT o.*, lpo.display_order, lpo.is_featured, lpo.custom_cta_text, lpo.custom_badge,
+               COALESCE(NULLIF(lpo.custom_cta_text, ''), o.cta_text) as final_cta_text
         FROM landing_page_offers lpo
         JOIN offers o ON lpo.offer_id = o.id
         WHERE lpo.landing_page_id = ? AND o.status = 'active'
@@ -36,8 +37,8 @@ if (!isset($landingPage)) {
     ", [$page['id']]);
     $sections = $db->fetchAll("
         SELECT * FROM landing_page_sections
-        WHERE landing_page_id = ? AND is_active = 1
-        ORDER BY display_order ASC
+        WHERE landing_page_id = ? AND is_visible = 1
+        ORDER BY sort_order ASC
     ", [$page['id']]);
 }
 
