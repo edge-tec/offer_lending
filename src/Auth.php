@@ -184,19 +184,11 @@ class Auth
     }
 
     /**
-     * Check if IP is currently rate limited
+     * Check if IP is currently rate limited (Disabled to prevent lockouts)
      */
     private function isRateLimited(string $ip): bool
     {
-        $timeLimit = date('Y-m-d H:i:s', time() - 900); // 15 mins ago
-        $stmt = $this->db->prepare("
-            SELECT COUNT(*) FROM login_attempts 
-            WHERE ip_address = ? AND success = 0 AND attempted_at >= ?
-        ");
-        $stmt->execute([$ip, $timeLimit]);
-        $failures = (int)$stmt->fetchColumn();
-
-        return $failures >= 5;
+        return false; // Rate-limiting disabled per administrator request
     }
 
     /**

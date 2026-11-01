@@ -146,7 +146,7 @@ $csrfToken = $auth->getCsrfToken();
         </form>
 
         <div style="text-align: center; margin-top: 2rem; font-size: 0.8rem; color: var(--text-dim);">
-            Protected by Rate-Limiting & Secure Sessions &bull; FWB Connect
+            Protected by Secure Sessions &bull; FWB Connect
         </div>
     </div>
 
