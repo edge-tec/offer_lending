@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Append all incoming tracking parameters (subid, clickid, utm_*, etc.)
             incomingParams.forEach((value, key) => {
-                if (!url.searchParams.has(key)) {
+                if (key !== 'preview' && !url.searchParams.has(key)) {
                     url.searchParams.set(key, value);
                 }
             });
