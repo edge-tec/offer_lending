@@ -498,11 +498,21 @@ h1, h2, h3, h4 {
   50% { transform: translateY(-8px); }
 }
 
-/* Feature Grid */
+/* Feature Grid & Multi-Offer Grid */
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   gap: 1.75rem;
+}
+
+.offers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 2rem;
+}
+
+.offer-card-featured {
+  position: relative;
 }
 
 .feature-card {
@@ -940,6 +950,83 @@ h1, h2, h3, h4 {
   cursor: pointer;
 }
 
+/* ========================================================
+   Mobile Sticky Bottom CTA Bar
+   ======================================================== */
+.mobile-sticky-cta {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  body {
+    padding-bottom: 78px; /* Offset for sticky bottom bar */
+  }
+
+  .mobile-sticky-cta {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(12, 14, 20, 0.94);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-top: 1px solid rgba(244, 63, 94, 0.25);
+    padding: 0.75rem 1rem;
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0.75rem));
+    z-index: 998;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.85rem;
+    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(244, 63, 94, 0.15);
+  }
+
+  .mobile-sticky-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #ffffff;
+    min-width: 0;
+  }
+
+  .mobile-sticky-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 8px #10b981;
+    flex-shrink: 0;
+    animation: pulse-dot 2s infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.85); }
+  }
+
+  .mobile-sticky-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mobile-sticky-cta .btn {
+    flex-shrink: 0;
+    padding: 0.65rem 1.25rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    min-height: 44px;
+  }
+}
+
+/* ========================================================
+   Responsive Breakpoints for All Mobile Devices
+   ======================================================== */
+
+/* Tablets & Small Laptops (<= 992px) */
 @media (max-width: 992px) {
   .hero-grid {
     grid-template-columns: 1fr;
@@ -971,30 +1058,253 @@ h1, h2, h3, h4 {
   }
 }
 
+/* Standard Mobile & Phablets (<= 768px) */
 @media (max-width: 768px) {
+  html {
+    font-size: 15px;
+  }
+
+  .container {
+    padding: 0 1.2rem;
+  }
+
+  .navbar {
+    padding: 0.85rem 0;
+  }
+
   .nav-links {
     display: none;
   }
+
+  .brand-logo span {
+    font-size: 1.05rem;
+  }
+
+  .nav-cta .btn {
+    padding: 0.6rem 1.15rem;
+    font-size: 0.85rem;
+  }
+
+  .hero-section {
+    padding: 6.5rem 0 3.5rem 0;
+    min-height: auto;
+  }
+
   .hero-headline {
-    font-size: 2.5rem;
+    font-size: clamp(2rem, 7vw, 2.75rem);
+    line-height: 1.18;
+    margin-bottom: 1.1rem;
   }
+
+  .hero-subtitle {
+    font-size: 1.05rem;
+    margin-bottom: 1.85rem;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.85rem;
+  }
+
+  .hero-actions .btn {
+    width: 100%;
+    min-height: 52px;
+    font-size: 1.05rem;
+  }
+
+  .hero-badges {
+    justify-content: center;
+    gap: 1.2rem;
+    padding-top: 1.2rem;
+  }
+
+  .trust-badge-item {
+    font-size: 0.84rem;
+  }
+
+  .hero-card-stack {
+    max-width: 100%;
+  }
+
+  .hero-img-wrapper {
+    height: 340px;
+  }
+
+  .floating-chip {
+    padding: 0.5rem 0.9rem;
+    font-size: 0.78rem;
+  }
+
+  .chip-1 {
+    top: 10px;
+    right: 10px;
+  }
+
+  .chip-2 {
+    bottom: 15px;
+    left: 10px;
+  }
+
   .section {
-    padding: 4rem 0;
+    padding: 3.5rem 0;
   }
+
   .section-title {
-    font-size: 1.85rem;
+    font-size: clamp(1.65rem, 6vw, 2.15rem);
+    line-height: 1.22;
   }
+
+  .section-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .offers-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .feature-card {
+    padding: 1.75rem 1.4rem;
+  }
+
+  .step-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .discovery-card {
+    height: 320px;
+  }
+
+  .faq-question {
+    padding: 1.15rem 1.25rem;
+    font-size: 0.98rem;
+  }
+
+  .cta-banner {
+    padding: 3rem 1.5rem;
+    border-radius: var(--radius-md);
+  }
+
   .cta-banner-title {
-    font-size: 1.95rem;
+    font-size: clamp(1.75rem, 6vw, 2.2rem);
+    line-height: 1.2;
   }
+
+  .cta-banner .btn {
+    width: 100%;
+    min-height: 52px;
+  }
+
   .cookie-banner {
     flex-direction: column;
     left: 1rem;
     right: 1rem;
-    bottom: 1rem;
+    bottom: 85px; /* Above mobile sticky CTA */
+    padding: 1.1rem;
   }
+
   .cookie-banner .btn {
     width: 100%;
+    min-height: 44px;
+  }
+}
+
+/* Compact Mobile (<= 480px) - iPhone standard, Samsung Galaxy */
+@media (max-width: 480px) {
+  html {
+    font-size: 14.5px;
+  }
+
+  .container {
+    padding: 0 1rem;
+  }
+
+  .hero-section {
+    padding: 5.5rem 0 3rem 0;
+  }
+
+  .hero-headline {
+    font-size: clamp(1.75rem, 7.5vw, 2.25rem);
+  }
+
+  .hero-subtitle {
+    font-size: 0.98rem;
+  }
+
+  .hero-img-wrapper {
+    height: 290px;
+  }
+
+  .hero-card-name {
+    font-size: 1.15rem;
+  }
+
+  .hero-card-desc {
+    font-size: 0.82rem;
+  }
+
+  .feature-card {
+    padding: 1.5rem 1.15rem;
+  }
+
+  .discovery-card {
+    height: 290px;
+  }
+
+  .discovery-overlay {
+    padding: 1.25rem;
+  }
+
+  .discovery-title {
+    font-size: 1.15rem;
+  }
+
+  .step-num {
+    font-size: 2.4rem;
+  }
+
+  .modal-card {
+    padding: 2rem 1.25rem;
+    margin: 1rem;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+
+  .modal-actions .btn {
+    width: 100%;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+}
+
+/* Extra Small Mobile (<= 360px) - iPhone SE 1st/2nd Gen */
+@media (max-width: 360px) {
+  .brand-logo span {
+    display: none; /* Keep icon only for extreme narrow widths */
+  }
+
+  .hero-headline {
+    font-size: 1.58rem;
+  }
+
+  .hero-img-wrapper {
+    height: 250px;
+  }
+
+  .btn {
+    padding: 0.75rem 1.2rem;
+    font-size: 0.92rem;
+  }
+
+  .mobile-sticky-info {
+    font-size: 0.75rem;
   }
 }
 

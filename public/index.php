@@ -31,7 +31,7 @@ $baseCtaUrl = '/go' . $campaignParam;
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
     <title>Friends With Benefits – Your Next Connection Starts Here | FWB Connect</title>
     
     <!-- Primary SEO Meta Tags -->
@@ -608,6 +608,18 @@ $baseCtaUrl = '/go' . $campaignParam;
                 Accept
             </button>
         </div>
+    </div>
+
+    <!-- Mobile Sticky Floating CTA Bar -->
+    <div class="mobile-sticky-cta">
+        <div class="mobile-sticky-info">
+            <span class="mobile-sticky-dot"></span>
+            <span class="mobile-sticky-text">1,400+ Active Nearby</span>
+        </div>
+        <a href="<?= $baseCtaUrl ?>" class="btn btn-primary cta-btn">
+            <span>Explore Now</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </a>
     </div>
 
     <!-- Script -->

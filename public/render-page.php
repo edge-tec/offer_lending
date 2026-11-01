@@ -65,7 +65,7 @@ $primaryCtaHref = $primaryOffer ? '/click?offer_id=' . $primaryOffer['id'] . '&p
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
     <title><?= Helpers::e($pageTitle) ?></title>
     
     <!-- SEO Meta Tags -->
@@ -229,7 +229,7 @@ $primaryCtaHref = $primaryOffer ? '/click?offer_id=' . $primaryOffer['id'] . '&p
                 </p>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem;">
+            <div class="offers-grid">
                 <?php foreach ($offers as $off): ?>
                     <?php 
                         $offerCtaHref = '/click?offer_id=' . $off['id'] . '&page_id=' . $landingPage['id'];
@@ -417,6 +417,18 @@ $primaryCtaHref = $primaryOffer ? '/click?offer_id=' . $primaryOffer['id'] . '&p
                 <button type="button" id="btnAgeConfirm" class="btn btn-primary">I Am 18 or Older</button>
             </div>
         </div>
+    </div>
+
+    <!-- Mobile Sticky Floating CTA Bar -->
+    <div class="mobile-sticky-cta">
+        <div class="mobile-sticky-info">
+            <span class="mobile-sticky-dot"></span>
+            <span class="mobile-sticky-text">1,400+ Active Nearby</span>
+        </div>
+        <a href="<?= $primaryCtaHref ?>" class="btn btn-primary cta-btn">
+            <span><?= Helpers::e($landingPage['hero_cta_text'] ?: 'Explore Now') ?></span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </a>
     </div>
 
     <script src="/assets/js/main.js"></script>
