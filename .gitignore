@@ -1,0 +1,15 @@
+# Storage and SQLite
+storage/*.sqlite
+storage/*.sqlite-journal
+storage/*.sqlite-wal
+storage/*.sqlite-shm
+
+# Environment & Local overrides
+.env
+.env.local
+.env.*.local
+
+# macOS system files
+.DS_Store
+Thumbs.db
+

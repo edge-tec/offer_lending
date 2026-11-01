@@ -1,0 +1,26 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Redirect /go to go.php
+    RewriteRule ^go/?$ go.php [L,QSA]
+
+    # Redirect /track-view to track-view.php
+    RewriteRule ^track-view/?$ track-view.php [L,QSA]
+
+    # Prevent directory listing
+    Options -Indexes
+
+    # Standard rewrite for clean URLs if file doesn't exist
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php [L,QSA]
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
