@@ -315,11 +315,19 @@ function seedEnterpriseData(\PDO $db): void
         )
     ");
 
-    $insertLpOffer = $db->prepare("
-        INSERT INTO landing_page_offers (landing_page_id, offer_id, display_order, is_featured, custom_cta_text)
-        VALUES (?, ?, ?, ?, ?)
-        ON CONFLICT(landing_page_id, offer_id) DO NOTHING
-    ");
+    $driver = $db->getAttribute(\PDO::ATTR_DRIVER_NAME);
+    if ($driver === 'sqlite') {
+        $insertLpOffer = $db->prepare("
+            INSERT INTO landing_page_offers (landing_page_id, offer_id, display_order, is_featured, custom_cta_text)
+            VALUES (?, ?, ?, ?, ?)
+            ON CONFLICT(landing_page_id, offer_id) DO NOTHING
+        ");
+    } else {
+        $insertLpOffer = $db->prepare("
+            INSERT IGNORE INTO landing_page_offers (landing_page_id, offer_id, display_order, is_featured, custom_cta_text)
+            VALUES (?, ?, ?, ?, ?)
+        ");
+    }
 
     $insertSection = $db->prepare("
         INSERT INTO landing_page_sections (landing_page_id, section_type, title, subtitle, sort_order, is_visible)
