@@ -10,6 +10,44 @@ require_once __DIR__ . '/../bootstrap.php';
 
 use App\Settings;
 use App\Helpers;
+use App\Database;
+
+// Internal router dispatch if web server sends requests to index.php
+$uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+
+// 1. If /go or /go/{short_code} requested, dispatch to go.php
+if ($uri === '/go' || $uri === '/go/' || str_starts_with($uri, '/go/')) {
+    if (str_starts_with($uri, '/go/')) {
+        $_GET['short_code'] = trim(substr($uri, 4), '/');
+    }
+    require __DIR__ . '/go.php';
+    exit;
+}
+
+// 2. If /click requested, dispatch to click.php
+if ($uri === '/click' || $uri === '/click/') {
+    require __DIR__ . '/click.php';
+    exit;
+}
+
+// 3. If /postback requested, dispatch to api/postback.php
+if ($uri === '/postback' || $uri === '/postback/' || $uri === '/api/postback' || $uri === '/api/postback/') {
+    require __DIR__ . '/api/postback.php';
+    exit;
+}
+
+// 4. If a custom landing page slug is requested (e.g. /love, /friends-with-benefits, /instabang)
+$trimmedSlug = trim($uri, '/');
+if ($trimmedSlug !== '' && $trimmedSlug !== 'index.php') {
+    $db = Database::getInstance()->getConnection();
+    $stmt = $db->prepare("SELECT id FROM landing_pages WHERE slug = ? AND status = 'published' LIMIT 1");
+    $stmt->execute([$trimmedSlug]);
+    if ($stmt->fetchColumn()) {
+        $_GET['slug'] = $trimmedSlug;
+        require __DIR__ . '/render-page.php';
+        exit;
+    }
+}
 
 Helpers::applySecurityHeaders();
 
@@ -25,7 +63,7 @@ $affiliateDisclaimer = $settings['affiliate_disclosure_short'] ?? 'This site is 
 
 // Current campaign query code if specified in URL
 $campaignParam = isset($_GET['c']) ? '?c=' . urlencode((string)$_GET['c']) : '';
-$baseCtaUrl = '/go' . $campaignParam;
+$baseCtaUrl = '/go.php' . $campaignParam;
 ?>
 <!DOCTYPE html>
 <html lang="en">

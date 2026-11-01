@@ -59,7 +59,7 @@ $badgeText = $landingPage['badge_text'] ?: '18+ Adults Only';
 
 // Determine primary offer & centralized CTA destination
 $primaryOffer = !empty($offers) ? $offers[0] : null;
-$primaryCtaHref = '/click?page_id=' . $landingPage['id'] . ($primaryOffer ? '&offer_id=' . $primaryOffer['id'] : '');
+$primaryCtaHref = '/click.php?page_id=' . $landingPage['id'] . ($primaryOffer ? '&offer_id=' . $primaryOffer['id'] : '');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -232,7 +232,7 @@ $primaryCtaHref = '/click?page_id=' . $landingPage['id'] . ($primaryOffer ? '&of
             <div class="offers-grid">
                 <?php foreach ($offers as $off): ?>
                     <?php 
-                        $offerCtaHref = '/click?offer_id=' . $off['id'] . '&page_id=' . $landingPage['id'];
+                        $offerCtaHref = '/click.php?offer_id=' . $off['id'] . '&page_id=' . $landingPage['id'];
                         $isFeatured = (bool)$off['is_featured'];
                     ?>
                     <div class="feature-card <?= $isFeatured ? 'offer-card-featured' : '' ?>" style="display: flex; flex-direction: column; justify-content: space-between; position: relative;">

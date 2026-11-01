@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. Synchronize Incoming Tracking Parameters to all CTA Buttons
     const incomingParams = new URLSearchParams(window.location.search);
-    const ctaButtons = document.querySelectorAll('a.cta-btn, a[href^="/go"]');
+    const ctaButtons = document.querySelectorAll('a.cta-btn, a[href*="/go"], a[href*="/click"]');
 
     ctaButtons.forEach(btn => {
         try {

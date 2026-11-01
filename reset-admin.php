@@ -48,3 +48,4 @@ try {
     echo "Error resetting admin: " . $e->getMessage() . "\n";
     exit(1);
 }
+
