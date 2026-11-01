@@ -130,7 +130,7 @@ $primaryCtaHref = '/click.php?page_id=' . $landingPage['id'] . ($primaryOffer ? 
             </a>
 
             <ul class="nav-links">
-                <li><a href="#offers" class="nav-link">Top Offers</a></li>
+                <li><a href="#offers" class="nav-link">Join with Date</a></li>
                 <li><a href="#why-explore" class="nav-link">Why Choose</a></li>
                 <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
                 <li><a href="#faq" class="nav-link">FAQ</a></li>
@@ -170,7 +170,7 @@ $primaryCtaHref = '/click.php?page_id=' . $landingPage['id'] . ($primaryOffer ? 
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                         </a>
                         <a href="#offers" class="btn btn-secondary btn-lg">
-                            <span>View All Offers</span>
+                            <span>Join with Date</span>
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </a>
                     </div>
