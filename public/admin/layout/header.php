@@ -37,25 +37,27 @@ $user = $auth->user();
             padding: 0.75rem 1rem 0.25rem 1rem;
             font-weight: 800;
         }
-        .admin-sidebar {
-            width: 270px;
-        }
-        .admin-main {
-            margin-left: 270px;
-        }
     </style>
 </head>
 <body>
 
 <div class="admin-wrapper">
+    <!-- Mobile sidebar drawer backdrop -->
+    <div id="adminSidebarBackdrop" class="admin-sidebar-backdrop"></div>
+
     <!-- Enterprise Sidebar -->
-    <aside class="admin-sidebar">
-        <a href="/admin/" class="admin-brand">
-            <div class="brand-icon-mini">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-            </div>
-            <span>Affiliate<strong>Hub</strong></span>
-        </a>
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="sidebar-header">
+            <a href="/admin/" class="admin-brand">
+                <div class="brand-icon-mini">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                </div>
+                <span>Affiliate<strong>Hub</strong></span>
+            </a>
+            <button type="button" id="adminSidebarClose" class="sidebar-close-btn" aria-label="Close navigation menu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
 
         <ul class="admin-nav">
             <li class="nav-item <?= ($currentPage ?? '') === 'dashboard' ? 'active' : '' ?>">
@@ -171,7 +173,18 @@ $user = $auth->user();
     <!-- Main Content Area -->
     <div class="admin-main">
         <header class="admin-topbar">
-            <h1 class="topbar-title"><?= Helpers::e($pageTitle ?? 'Dashboard') ?></h1>
+            <div class="topbar-left">
+                <button type="button" id="adminSidebarToggle" class="btn-sidebar-toggle" aria-label="Open navigation menu">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
+                <div class="mobile-topbar-brand">
+                    <div class="brand-icon-mini">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                    </div>
+                    <span>Affiliate<strong>Hub</strong></span>
+                </div>
+                <h1 class="topbar-title"><?= Helpers::e($pageTitle ?? 'Dashboard') ?></h1>
+            </div>
             <div class="topbar-actions">
                 <div class="user-badge">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>

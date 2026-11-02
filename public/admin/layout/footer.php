@@ -83,6 +83,41 @@ document.querySelectorAll('.modal-admin').forEach(m => {
         }
     });
 });
+
+// Mobile Sidebar Drawer Controller
+(function() {
+    const sidebarToggle = document.getElementById('adminSidebarToggle');
+    const sidebarClose = document.getElementById('adminSidebarClose');
+    const sidebarBackdrop = document.getElementById('adminSidebarBackdrop');
+
+    function setDrawer(open) {
+        document.body.classList.toggle('sidebar-open', open);
+    }
+
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', () => setDrawer(true));
+    }
+    if (sidebarClose) {
+        sidebarClose.addEventListener('click', () => setDrawer(false));
+    }
+    if (sidebarBackdrop) {
+        sidebarBackdrop.addEventListener('click', () => setDrawer(false));
+    }
+
+    // Auto-close drawer when clicking any nav link on mobile
+    document.querySelectorAll('.admin-nav a, .sidebar-footer a').forEach(a => {
+        a.addEventListener('click', () => {
+            if (window.innerWidth < 992) {
+                setDrawer(false);
+            }
+        });
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') setDrawer(false);
+    });
+})();
 </script>
 </body>
 </html>
