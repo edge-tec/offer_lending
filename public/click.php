@@ -49,7 +49,7 @@ $message = Helpers::e($result['message'] ?? 'An error occurred during redirect.'
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $title ?></title>
-    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/style.css?v=<?= filemtime(__DIR__ . '/assets/css/style.css') ?>">
     <style>
         body { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1.5rem; background: #08090d; }
         .box { max-width: 460px; width: 100%; background: #12151f; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 2.5rem 2rem; text-align: center; }

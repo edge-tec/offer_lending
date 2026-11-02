@@ -82,7 +82,7 @@ $primaryCtaHref = '/click.php?page_id=' . $landingPage['id'] . ($primaryOffer ? 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/style.css?v=<?= filemtime(__DIR__ . '/assets/css/style.css') ?>">
 
     <!-- Dynamic Custom Theme Palette -->
     <style>
@@ -114,10 +114,12 @@ $primaryCtaHref = '/click.php?page_id=' . $landingPage['id'] . ($primaryOffer ? 
 </head>
 <body>
 
-    <!-- Ambient Glows -->
-    <div class="ambient-glow glow-1"></div>
-    <div class="ambient-glow glow-2"></div>
-    <div class="ambient-glow glow-3"></div>
+    <!-- Ambient Glows (Contained to prevent mobile canvas stretch) -->
+    <div class="ambient-glows-wrapper">
+        <div class="ambient-glow glow-1"></div>
+        <div class="ambient-glow glow-2"></div>
+        <div class="ambient-glow glow-3"></div>
+    </div>
 
     <!-- Navigation -->
     <nav class="navbar">

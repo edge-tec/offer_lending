@@ -103,3 +103,4 @@ $remaining = $db->query("
 echo "  [✓] Active Verified Conversions   : " . (int)$remaining['cnt'] . "\n";
 echo "  [✓] Verified Affiliate Revenue    : $" . number_format((float)$remaining['total_rev'], 2) . "\n";
 echo "====================================================================\n\n";
+

@@ -96,8 +96,8 @@ $baseCtaUrl = '/go.php' . $campaignParam;
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Stylesheet -->
-    <link rel="stylesheet" href="/assets/css/style.css">
+    <!-- Stylesheet with Cache-Buster -->
+    <link rel="stylesheet" href="/assets/css/style.css?v=<?= filemtime(__DIR__ . '/assets/css/style.css') ?>">
 
     <!-- Schema.org JSON-LD -->
     <script type="application/ld+json">
@@ -144,10 +144,12 @@ $baseCtaUrl = '/go.php' . $campaignParam;
 </head>
 <body>
 
-    <!-- Ambient Gradient Glows -->
-    <div class="ambient-glow glow-1"></div>
-    <div class="ambient-glow glow-2"></div>
-    <div class="ambient-glow glow-3"></div>
+    <!-- Ambient Gradient Glows (Contained to prevent mobile canvas stretch) -->
+    <div class="ambient-glows-wrapper">
+        <div class="ambient-glow glow-1"></div>
+        <div class="ambient-glow glow-2"></div>
+        <div class="ambient-glow glow-3"></div>
+    </div>
 
     <!-- Navigation Bar -->
     <nav class="navbar">
