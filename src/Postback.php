@@ -56,7 +56,7 @@ class Postback
         $status = strtolower(trim((string)($params['status'] ?? 'approved')));
 
         if ($txid === '') {
-            $txid = 'TX_' . md5($clickId . '_' . microtime(true));
+            $txid = 'TX_' . md5($clickId);
         }
 
         // 1. Log incoming postback
@@ -70,12 +70,25 @@ class Postback
             return ['success' => false, 'message' => 'Missing click_id parameter.', 'code' => 400];
         }
 
-        // 2. Prevent duplicate conversion
-        $checkDup = $this->db->prepare("SELECT id FROM conversions WHERE transaction_id = ? LIMIT 1");
-        $checkDup->execute([$txid]);
-        if ($checkDup->fetchColumn()) {
+        // 2. Prevent duplicate conversion: check if this transaction_id OR this click_id already converted
+        $checkDup = $this->db->prepare("SELECT id, payout, status FROM conversions WHERE transaction_id = ? OR click_id = ? LIMIT 1");
+        $checkDup->execute([$txid, $clickId]);
+        $existingConv = $checkDup->fetch(\PDO::FETCH_ASSOC);
+
+        if ($existingConv) {
+            // If payout changed or status updated, refresh existing record rather than creating a duplicate
+            if ($payout > 0 || ($status !== '' && $status !== $existingConv['status'])) {
+                $upd = $this->db->prepare("UPDATE conversions SET payout = CASE WHEN ? > 0 THEN ? ELSE payout END, status = ? WHERE id = ?");
+                $upd->execute([$payout, $payout, $status, $existingConv['id']]);
+            }
             $logStmt->execute([$method, $_SERVER['REQUEST_URI'] ?? '', $rawBody, json_encode($params), 200, 'Duplicate transaction ignored', $ip]);
-            return ['success' => true, 'message' => 'Duplicate transaction ID ignored.', 'code' => 200];
+            return [
+                'success' => true,
+                'message' => 'Duplicate transaction ID ignored.',
+                'code' => 200,
+                'transaction_id' => $txid,
+                'conversion_id' => $existingConv['id']
+            ];
         }
 
         // 3. Find matching offer click
@@ -136,6 +149,64 @@ class Postback
             LIMIT {$limit}
         ";
         return $this->db->query($sql)->fetchAll();
+    }
+
+    /**
+     * Deduplicate conversions table:
+     * Keeps the earliest conversion for each click_id and deletes duplicates
+     */
+    public function deduplicateConversions(): int
+    {
+        $duplicates = $this->db->query("
+            SELECT click_id, MIN(id) as keep_id, COUNT(*) as cnt
+            FROM conversions
+            WHERE click_id IS NOT NULL AND click_id != ''
+            GROUP BY click_id
+            HAVING cnt > 1
+        ")->fetchAll(\PDO::FETCH_ASSOC);
+
+        $deletedCount = 0;
+        foreach ($duplicates as $dup) {
+            $stmt = $this->db->prepare("DELETE FROM conversions WHERE click_id = ? AND id != ?");
+            $stmt->execute([$dup['click_id'], $dup['keep_id']]);
+            $deletedCount += ((int)$dup['cnt'] - 1);
+        }
+
+        // Check if duplicate transaction_ids exist as well
+        $txDups = $this->db->query("
+            SELECT transaction_id, MIN(id) as keep_id, COUNT(*) as cnt
+            FROM conversions
+            WHERE transaction_id IS NOT NULL AND transaction_id != ''
+            GROUP BY transaction_id
+            HAVING cnt > 1
+        ")->fetchAll(\PDO::FETCH_ASSOC);
+
+        foreach ($txDups as $dup) {
+            $stmt = $this->db->prepare("DELETE FROM conversions WHERE transaction_id = ? AND id != ?");
+            $stmt->execute([$dup['transaction_id'], $dup['keep_id']]);
+            $deletedCount += ((int)$dup['cnt'] - 1);
+        }
+
+        return $deletedCount;
+    }
+
+    /**
+     * Delete a single conversion by ID
+     */
+    public function deleteConversion(int $id): bool
+    {
+        $stmt = $this->db->prepare("DELETE FROM conversions WHERE id = ?");
+        return $stmt->execute([$id]);
+    }
+
+    /**
+     * Clear all mock / test conversions
+     */
+    public function clearTestConversions(): int
+    {
+        $stmt = $this->db->prepare("DELETE FROM conversions WHERE click_id LIKE 'clk_mock%' OR transaction_id LIKE 'TX_TEST_SUITE%' OR transaction_id LIKE 'TX_REALTIME%'");
+        $stmt->execute();
+        return $stmt->rowCount();
     }
 }
 

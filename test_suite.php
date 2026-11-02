@@ -169,10 +169,11 @@ it('8. Administrator can create an unlimited new custom landing page', function 
 it('9. Processes S2S affiliate conversion postbacks and prevents duplicate transactions', function () {
     $postback = new Postback();
     $txid = 'TX_TEST_SUITE_' . time();
+    $clickId = 'clk_test_dup_' . time();
 
     // 1st conversion attempt
     $res1 = $postback->handle([
-        'clickid' => 'clk_mock_9999',
+        'clickid' => $clickId,
         'payout' => 45.50,
         'txid' => $txid,
         'status' => 'approved'
@@ -181,7 +182,7 @@ it('9. Processes S2S affiliate conversion postbacks and prevents duplicate trans
 
     // Duplicate attempt with same txid
     $res2 = $postback->handle([
-        'clickid' => 'clk_mock_9999',
+        'clickid' => $clickId,
         'payout' => 45.50,
         'txid' => $txid,
         'status' => 'approved'
@@ -189,6 +190,10 @@ it('9. Processes S2S affiliate conversion postbacks and prevents duplicate trans
     if ($res2['message'] !== 'Duplicate transaction ID ignored.') {
         throw new \Exception("Duplicate transaction was not prevented!");
     }
+
+    // Clean up test conversion
+    $db = Database::getInstance()->getConnection();
+    $db->prepare("DELETE FROM conversions WHERE click_id = ?")->execute([$clickId]);
 });
 
 // 10. Open Redirect Protection & Auto-Whitelisting

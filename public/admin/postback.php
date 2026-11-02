@@ -15,6 +15,26 @@ $auth = new Auth();
 $auth->requireLogin();
 
 $postbackService = new Postback();
+$successMessage = null;
+$errorMessage = null;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $action = $_POST['action'] ?? '';
+    if ($action === 'deduplicate') {
+        $count = $postbackService->deduplicateConversions();
+        $successMessage = "Successfully removed {$count} duplicate conversion records. Unique clicks preserved.";
+    } elseif ($action === 'delete') {
+        $id = (int)($_POST['conversion_id'] ?? 0);
+        if ($id > 0) {
+            $postbackService->deleteConversion($id);
+            $successMessage = "Conversion record #{$id} deleted successfully.";
+        }
+    } elseif ($action === 'clear_test') {
+        $count = $postbackService->clearTestConversions();
+        $successMessage = "Successfully removed {$count} automated test/mock conversion records.";
+    }
+}
+
 $conversions = $postbackService->getConversions(50);
 $logs = $postbackService->getLogs(50);
 
@@ -22,6 +42,13 @@ $currentPage = 'postback';
 $pageTitle = 'S2S Postback & Conversion Manager';
 require_once __DIR__ . '/layout/header.php';
 ?>
+
+<?php if ($successMessage): ?>
+    <div class="alert alert-success" style="display: flex; align-items: center; gap: 0.75rem; background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #34d399; padding: 1rem 1.25rem; border-radius: var(--radius-sm); margin-bottom: 1.5rem;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        <span><?= Helpers::e($successMessage) ?></span>
+    </div>
+<?php endif; ?>
 
 <div style="margin-bottom: 2rem;">
     <p style="color: var(--text-muted); font-size: 0.92rem;">
@@ -52,8 +79,22 @@ require_once __DIR__ . '/layout/header.php';
 
 <!-- Verified Conversions Table -->
 <div class="card">
-    <div class="card-header">
+    <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
         <h2 class="card-title">Verified Conversions (Latest <?= count($conversions) ?>)</h2>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <form method="POST" style="margin: 0;" onsubmit="return confirm('Clean all duplicate conversions? Only the earliest conversion per click will be kept.');">
+                <input type="hidden" name="action" value="deduplicate">
+                <button type="submit" class="btn btn-secondary btn-sm">
+                    ⚡ Clean Duplicate Pings
+                </button>
+            </form>
+            <form method="POST" style="margin: 0;" onsubmit="return confirm('Remove all automated test conversions?');">
+                <input type="hidden" name="action" value="clear_test">
+                <button type="submit" class="btn btn-secondary btn-sm" style="color: #f87171;">
+                    🧹 Clear Test Data
+                </button>
+            </form>
+        </div>
     </div>
 
     <div class="table-responsive">
@@ -67,11 +108,12 @@ require_once __DIR__ . '/layout/header.php';
                     <th>Landing Page</th>
                     <th>Payout / Revenue</th>
                     <th>Status</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($conversions)): ?>
-                    <tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-dim);">No conversions recorded yet. Incoming affiliate postbacks will appear here.</td></tr>
+                    <tr><td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-dim);">No conversions recorded yet. Incoming affiliate postbacks will appear here.</td></tr>
                 <?php else: ?>
                     <?php foreach ($conversions as $c): ?>
                         <tr>
@@ -82,6 +124,15 @@ require_once __DIR__ . '/layout/header.php';
                             <td><?= Helpers::e($c['page_name'] ?? '-') ?></td>
                             <td style="color: #34d399; font-weight: 700;">$<?= number_format((float)$c['payout'], 2) ?> <?= Helpers::e($c['currency']) ?></td>
                             <td><span class="badge badge-success"><?= Helpers::e($c['status']) ?></span></td>
+                            <td>
+                                <form method="POST" style="margin:0;" onsubmit="return confirm('Delete conversion #<?= $c['id'] ?>?');">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="conversion_id" value="<?= (int)$c['id'] ?>">
+                                    <button type="submit" class="btn btn-danger btn-sm" style="padding: 0.25rem 0.55rem; font-size: 0.75rem;">
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>
